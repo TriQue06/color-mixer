@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Mixer</title>
+    <style>
+        /* Font Tanımlaması */
+        @font-face {
+            font-family: 'Product Sans';
+            src: url('ProductSans-Bold.ttf') format('truetype');
+            font-weight: bold;
+            font-style: normal;
+        }
+
+        /* Genel Ayarlar */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Product Sans', sans-serif;
+        }
+
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: #1e1e2e;
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 550px;
+        }
+
+        /* Sonuç Gösterim Alanı */
+        .result-box {
+            width: 100%;
+            height: 150px;
+            border-radius: 16px;
+            background-color: #000000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 30px;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+        }
+
+        .result-box:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .result-hex {
+            font-size: 2rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 2px;
+            pointer-events: none;
+        }
+
+        .copy-text {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-top: 5px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            pointer-events: none;
+        }
+
+        /* Renk Satırları */
+        .color-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+            max-height: 350px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        /* Scrollbar Özelleştirme */
+        .color-list::-webkit-scrollbar { width: 6px; }
+        .color-list::-webkit-scrollbar-thumb { background-color: #3b3b54; border-radius: 10px; }
+
+        .color-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background-color: #2a2a3f;
+            padding: 15px;
+            border-radius: 12px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Renk Seçici Buton (Sistem) */
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            padding: 0;
+            background: none;
+            flex-shrink: 0;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: 2px solid #ffffff33; border-radius: 50%; }
+
+        /* Hex Metin Kutusu */
+        .hex-input {
+            background: #1e1e2e;
+            border: 2px solid transparent;
+            color: white;
+            padding: 8px 10px;
+            border-radius: 8px;
+            width: 85px;
+            font-size: 0.9rem;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.2s, background-color 0.2s;
+            text-transform: uppercase;
+        }
+        .hex-input:focus {
+            border-color: #8888ff;
+            background: #2a2a3f;
+        }
+
+        /* Slider */
+        input[type="range"] {
+            flex-grow: 1;
+            accent-color: #8888ff;
+            cursor: pointer;
+            min-width: 50px;
+        }
+
+        /* Yüzde Input */
+        .weight-input-wrapper {
+            display: flex;
+            align-items: center;
+            background: #1e1e2e;
+            border-radius: 8px;
+            padding: 5px 10px;
+            flex-shrink: 0;
+        }
+
+        input[type="number"] {
+            background: transparent;
+            border: none;
+            color: white;
+            width: 40px;
+            font-size: 1rem;
+            text-align: right;
+            outline: none;
+            -moz-appearance: textfield;
+        }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        .percent-sign {
+            margin-left: 2px;
+            color: #888;
+        }
+
+        /* Silme Butonu */
+        .remove-btn {
+            background: transparent;
+            border: none;
+            color: #ff5555;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            flex-shrink: 0;
+        }
+        .remove-btn:hover { color: #ff2222; }
+
+        /* Ekleme Butonu */
+        .add-btn {
+            width: 100%;
+            background-color: #3b3b54;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .add-btn:hover { background-color: #4a4a6a; }
+
+        /* Toast Bildirimi (Kopyalandı) */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 1rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s, transform 0.3s;
+            pointer-events: none;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="result-box" id="resultBox">
+            <div class="result-hex" id="resultHex">#000000</div>
+            <div class="copy-text" id="copyText">Kopyalamak için tıkla</div>
+        </div>
+
+        <div class="color-list" id="colorList">
+            </div>
+
+        <button class="add-btn" onclick="addColorRow('#FFFFFF', 50, true)">
+            <span>+</span> Yeni Renk Ekle
+        </button>
+    </div>
+
+    <div class="toast" id="toast">Hex kodu kopyalandı!</div>
+
+    <script>
+        const colorList = document.getElementById('colorList');
+        const resultBox = document.getElementById('resultBox');
+        const resultHex = document.getElementById('resultHex');
+        const toast = document.getElementById('toast');
+        let currentHex = "#000000";
+
+        // Hex'i RGB'ye çevir
+        function hexToRgb(hex) {
+            // Kısa hex (#FFF) formatını uzun formata (#FFFFFF) çevir
+            if (hex.length === 4) {
+                hex = '#' + hex[1] + hex[1] + hex[2] + hex[2] + hex[3] + hex[3];
+            }
+            const r = parseInt(hex.slice(1, 3), 16) || 0;
+            const g = parseInt(hex.slice(3, 5), 16) || 0;
+            const b = parseInt(hex.slice(5, 7), 16) || 0;
+            return { r, g, b };
+        }
+
+        // RGB'yi Hex'e çevir
+        function rgbToHex(r, g, b) {
+            const toHex = (c) => {
+                const hex = Math.round(c).toString(16);
+                return hex.length === 1 ? "0" + hex : hex;
+            };
+            return "#" + toHex(r) + toHex(g) + toHex(b);
+        }
+
+        // Parlaklık hesabı
+        function getBrightness(r, g, b) {
+            return (r * 299 + g * 587 + b * 114) / 1000;
+        }
+
+        // Renkleri Karıştır
+        function mixColors() {
+            let totalWeight = 0;
+            let totalR = 0, totalG = 0, totalB = 0;
+
+            const rows = document.querySelectorAll('.color-row');
+
+            rows.forEach(row => {
+                const hexValue = row.querySelector('.hex-input').value;
+                const weightValue = parseFloat(row.querySelector('.number-input').value) || 0;
+
+                // Sadece geçerli uzunluktaki hex kodlarını işleme dahil et
+                if (hexValue.length === 7 || hexValue.length === 4) {
+                    const { r, g, b } = hexToRgb(hexValue);
+                    totalR += r * weightValue;
+                    totalG += g * weightValue;
+                    totalB += b * weightValue;
+                    totalWeight += weightValue;
+                }
+            });
+
+            if (totalWeight === 0) {
+                updateResultBox(0, 0, 0); 
+            } else {
+                updateResultBox(
+                    totalR / totalWeight,
+                    totalG / totalWeight,
+                    totalB / totalWeight
+                );
+            }
+        }
+
+        // Sonuç Kutusunu Güncelle
+        function updateResultBox(r, g, b) {
+            currentHex = rgbToHex(r, g, b).toUpperCase();
+            resultBox.style.backgroundColor = currentHex;
+            resultHex.textContent = currentHex;
+
+            const brightness = getBrightness(r, g, b);
+            const textColor = brightness > 128 ? '#000000' : '#ffffff';
+            resultHex.style.color = textColor;
+            document.getElementById('copyText').style.color = textColor;
+        }
+
+        // Yeni Renk Satırı Ekle
+        function addColorRow(defaultColor = '#8888FF', defaultWeight = 50, focusHex = false) {
+            const row = document.createElement('div');
+            row.className = 'color-row';
+
+            row.innerHTML = `
+                <input type="color" class="color-picker" value="${defaultColor}">
+                <input type="text" class="hex-input" value="${defaultColor}" maxlength="7">
+                <input type="range" class="range-input" min="0" max="100" value="${defaultWeight}">
+                <div class="weight-input-wrapper">
+                    <input type="number" class="number-input" min="0" max="100" value="${defaultWeight}">
+                    <span class="percent-sign">%</span>
+                </div>
+                <button class="remove-btn" title="Sil">×</button>
+            `;
+
+            const colorPicker = row.querySelector('.color-picker');
+            const hexInput = row.querySelector('.hex-input');
+            const rangeInput = row.querySelector('.range-input');
+            const numberInput = row.querySelector('.number-input');
+            const removeBtn = row.querySelector('.remove-btn');
+
+            // Sistem Color Picker değişirse Hex kutusunu güncelle
+            colorPicker.addEventListener('input', (e) => {
+                hexInput.value = e.target.value.toUpperCase();
+                mixColors();
+            });
+
+            // Akıllı Hex Kutusu Dinleyicisi (Yazma & Yapıştırma)
+            hexInput.addEventListener('input', (e) => {
+                let val = e.target.value;
+
+                // Eğer başında '#' yoksa ekle
+                if (val.charAt(0) !== '#') {
+                    val = '#' + val;
+                }
+
+                // '#' dışındaki geçersiz karakterleri temizle
+                val = val.substring(0, 1) + val.substring(1).replace(/[^0-9a-fA-F]/g, '');
+                
+                // Uzunluğu sınırla
+                if (val.length > 7) val = val.substring(0, 7);
+                
+                e.target.value = val;
+
+                // Geçerli bir hex ise sistem picker'ı ve karışımı güncelle
+                if (val.length === 7 || val.length === 4) {
+                    // Sistem picker 3 haneli hex sevmez, 6 haneliye çevirip verelim
+                    let fullHex = val;
+                    if (val.length === 4) {
+                        fullHex = '#' + val[1]+val[1] + val[2]+val[2] + val[3]+val[3];
+                    }
+                    colorPicker.value = fullHex;
+                    mixColors();
+                }
+            });
+
+            // Odaklanıldığında içindeki metni seç (Kolay yapıştırma için)
+            hexInput.addEventListener('focus', () => {
+                hexInput.select();
+            });
+
+            // Slider değişimi
+            rangeInput.addEventListener('input', (e) => {
+                numberInput.value = e.target.value;
+                mixColors();
+            });
+
+            // Sayısal input değişimi
+            numberInput.addEventListener('input', (e) => {
+                let val = parseInt(e.target.value);
+                if (isNaN(val)) val = 0;
+                if (val > 100) val = 100;
+                if (val < 0) val = 0;
+                
+                e.target.value = val; 
+                rangeInput.value = val;
+                mixColors();
+            });
+
+            // Silme Butonu
+            removeBtn.addEventListener('click', () => {
+                row.remove();
+                mixColors();
+            });
+
+            colorList.appendChild(row);
+            mixColors();
+
+            // Eğer butonla eklendiyse otomatik odaklan
+            if (focusHex) {
+                // DOM'un render olması için çok kısa bir süre tanıyoruz
+                setTimeout(() => {
+                    hexInput.focus();
+                }, 10);
+            }
+        }
+
+        // Panoya Kopyalama İşlemi
+        resultBox.addEventListener('click', () => {
+            navigator.clipboard.writeText(currentHex).then(() => {
+                showToast();
+            });
+        });
+
+        function showToast() {
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // Başlangıçta örnek renkler
+        addColorRow('#FF3366', 100, false);
+        addColorRow('#FFFFFF', 75, false);
+
+    </script>
+</body>
+</html>
