@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Color Studio Pro</title>
     <style>
-        /* Product Sans Font Tanımlaması (Globally Hosted) */
+        /* Product Sans Font Tanımlaması */
         @font-face {
             font-family: 'Product Sans';
             font-style: normal;
@@ -19,6 +19,11 @@
             src: url(https://fonts.gstatic.com/s/productsans/v5/HYvgU2fE2nRJvZ5OSFAumwegdm0LZdjqr5-oayXSOefg.woff2) format('woff2');
         }
 
+        /* %110 BÜYÜTME İÇİN KÖK AYARLAR */
+        html {
+            font-size: 110%; /* Tüm 'rem' bazlı fontları %10 büyütür */
+        }
+
         :root {
             --bg-main: #0f0f13;
             --bg-card: #1c1c24;
@@ -29,9 +34,10 @@
             --accent-hover: #4f46e5;
             --danger: #ef4444;
             --border: #2a2a35;
-            --radius-lg: 20px;
-            --radius-md: 12px;
-            --radius-sm: 8px;
+            /* Yarıçaplar da %10 civarı artırıldı */
+            --radius-lg: 22px;
+            --radius-md: 14px;
+            --radius-sm: 9px;
         }
 
         * {
@@ -39,6 +45,13 @@
             margin: 0;
             padding: 0;
             font-family: 'Product Sans', system-ui, sans-serif;
+            /* Sürükleme sırasında metinlerin seçilmesini engeller */
+            user-select: none; 
+        }
+
+        /* Girdi kutularında metin seçimine izin verelim */
+        input[type="text"], input[type="number"] {
+            user-select: text;
         }
 
         body {
@@ -48,7 +61,7 @@
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
-            padding: 40px 20px;
+            padding: 45px 25px;
             overflow-x: hidden;
         }
 
@@ -56,9 +69,9 @@
         .app-wrapper {
             display: flex;
             flex-direction: row;
-            gap: 30px;
+            gap: 35px;
             width: 100%;
-            max-width: 1100px;
+            max-width: 1200px;
             align-items: flex-start;
         }
 
@@ -69,9 +82,9 @@
         /* Kart Yapısı */
         .card {
             background-color: var(--bg-card);
-            padding: 30px;
+            padding: 35px;
             border-radius: var(--radius-lg);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 22px 45px rgba(0, 0, 0, 0.4);
             width: 100%;
             flex: 1;
         }
@@ -80,7 +93,7 @@
             text-align: center;
             font-size: 1.3rem;
             font-weight: 700;
-            margin-bottom: 20px;
+            margin-bottom: 22px;
             color: var(--text-muted);
             letter-spacing: 1px;
             text-transform: uppercase;
@@ -88,10 +101,10 @@
 
         /* ======= MIXER (KARIŞTIRICI) BÖLÜMÜ ======= */
         .result-box {
-            width: 100%; height: 140px; border-radius: var(--radius-md);
+            width: 100%; height: 155px; border-radius: var(--radius-md);
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;
-            margin-bottom: 20px; position: relative; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
+            margin-bottom: 22px; position: relative; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
         }
         .result-box:hover {
             transform: translateY(-2px);
@@ -101,42 +114,40 @@
         .copy-text { font-size: 0.85rem; opacity: 0.8; margin-top: 8px; pointer-events: none; transition: color 0.3s ease; }
 
         /* Ön Ayarlar (Presets) */
-        .presets-container { display: flex; gap: 10px; margin-bottom: 20px; }
+        .presets-container { display: flex; gap: 12px; margin-bottom: 22px; }
         .preset-btn {
             flex: 1; background: var(--bg-hover); color: var(--text-main); border: 1px solid var(--border);
-            padding: 8px 5px; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 700;
+            padding: 10px 6px; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 700;
             cursor: pointer; transition: all 0.2s; text-align: center;
         }
         .preset-btn:hover { background: var(--accent); border-color: var(--accent); }
 
         /* Renk Listesi */
         .color-list {
-            display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;
-            max-height: 380px; overflow-y: auto; padding-right: 5px;
+            display: flex; flex-direction: column; gap: 14px; margin-bottom: 26px;
+            max-height: 420px; overflow-y: auto; padding-right: 5px;
         }
         .color-list::-webkit-scrollbar { width: 6px; }
         .color-list::-webkit-scrollbar-thumb { background-color: var(--border); border-radius: 10px; }
 
         .color-row {
-            display: flex; align-items: center; gap: 12px; background-color: var(--bg-hover);
-            padding: 10px 15px; border-radius: var(--radius-md); animation: fadeIn 0.3s ease;
+            display: flex; align-items: center; gap: 14px; background-color: var(--bg-hover);
+            padding: 12px 18px; border-radius: var(--radius-md); animation: fadeIn 0.3s ease;
         }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* KARE SWATCH TASARIMI */
         .color-swatch {
-            width: 45px; height: 45px; border-radius: 12px;
+            width: 50px; height: 50px; border-radius: 12px;
             cursor: pointer; border: 2px solid rgba(255,255,255,0.2);
             flex-shrink: 0; transition: transform 0.1s; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         .color-swatch:hover { transform: scale(1.05); border-color: rgba(255,255,255,0.5); }
 
-        /* DÜZENLENEBİLİR HEX KUTUSU */
         .mixer-hex-input {
             background: var(--bg-main); border: 1px solid var(--border);
             color: var(--text-main); border-radius: var(--radius-sm);
-            width: 80px; padding: 6px; text-align: center; font-size: 0.95rem;
+            width: 90px; padding: 8px; text-align: center; font-size: 0.95rem;
             outline: none; font-weight: 700; transition: border-color 0.2s;
         }
         .mixer-hex-input:focus { border-color: var(--accent); }
@@ -146,12 +157,12 @@
             background: var(--bg-main); border-radius: 3px; -webkit-appearance: none;
         }
         input[type="range"].weight-slider::-webkit-slider-thumb {
-            -webkit-appearance: none; width: 14px; height: 14px; background: var(--accent); border-radius: 50%;
+            -webkit-appearance: none; width: 16px; height: 16px; background: var(--accent); border-radius: 50%;
         }
 
         .weight-input-wrapper {
             display: flex; align-items: center; background: var(--bg-main); border-radius: var(--radius-sm);
-            padding: 5px; width: 55px; border: 1px solid transparent; transition: border-color 0.2s;
+            padding: 6px; width: 60px; border: 1px solid transparent; transition: border-color 0.2s;
         }
         .weight-input-wrapper:focus-within { border-color: var(--accent); }
         .weight-input-wrapper input {
@@ -160,54 +171,55 @@
         }
         
         .remove-btn {
-            background: transparent; border: none; color: var(--text-muted); font-size: 1.4rem;
-            cursor: pointer; transition: color 0.2s; width: 28px; height: 28px; border-radius: var(--radius-sm);
+            background: transparent; border: none; color: var(--text-muted); font-size: 1.5rem;
+            cursor: pointer; transition: color 0.2s; width: 30px; height: 30px; border-radius: var(--radius-sm);
         }
         .remove-btn:hover { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
 
         .add-btn {
             width: 100%; background-color: transparent; color: var(--accent); border: 2px dashed var(--border);
-            padding: 12px; border-radius: var(--radius-md); font-size: 0.95rem; font-weight: 700;
-            cursor: pointer; transition: all 0.2s; display: flex; justify-content: center; gap: 10px;
+            padding: 14px; border-radius: var(--radius-md); font-size: 0.95rem; font-weight: 700;
+            cursor: pointer; transition: all 0.2s; display: flex; justify-content: center; gap: 12px;
         }
         .add-btn:hover { border-color: var(--accent); background: rgba(99, 102, 241, 0.05); }
 
 
         /* ======= CUSTOM COLOR PICKER COMPONENT ======= */
         .picker-area {
-            width: 100%; height: 160px; border-radius: var(--radius-sm); position: relative;
-            cursor: crosshair; margin-bottom: 15px; background-color: red;
+            width: 100%; height: 180px; border-radius: var(--radius-sm); position: relative;
+            cursor: crosshair; margin-bottom: 18px; background-color: red;
             background-image: linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, transparent);
             box-shadow: inset 0 0 0 1px rgba(0,0,0,0.2); overflow: hidden;
+            touch-action: none; 
         }
         .picker-thumb {
-            width: 16px; height: 16px; border-radius: 50%; border: 2px solid white;
+            width: 18px; height: 18px; border-radius: 50%; border: 2px solid white;
             box-shadow: 0 0 4px rgba(0,0,0,0.5); position: absolute; transform: translate(-50%, -50%); pointer-events: none;
         }
         .hue-slider-container {
-            width: 100%; height: 16px; border-radius: 8px;
+            width: 100%; height: 18px; border-radius: 9px;
             background: linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
-            position: relative; margin-bottom: 20px; cursor: pointer;
+            position: relative; margin-bottom: 22px; cursor: pointer;
+            touch-action: none;
         }
         .hue-thumb {
-            width: 20px; height: 20px; background: white; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+            width: 22px; height: 22px; background: white; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.4);
             position: absolute; top: 50%; transform: translate(-50%, -50%); pointer-events: none;
         }
         
-        /* Girdiler - YENİ FERAHLATILMIŞ DÜZEN */
-        .picker-inputs { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
+        .picker-inputs { display: flex; flex-direction: column; gap: 18px; margin-bottom: 22px; }
         .input-group { display: flex; flex-direction: column; gap: 8px; }
-        .input-row { display: flex; align-items: center; gap: 10px; width: 100%; }
-        .input-label { width: 45px; font-size: 0.85rem; color: var(--text-muted); font-weight: 700; letter-spacing: 0.5px;}
+        .input-row { display: flex; align-items: center; gap: 12px; width: 100%; }
+        .input-label { width: 50px; font-size: 0.85rem; color: var(--text-muted); font-weight: 700; letter-spacing: 0.5px;}
         
         .picker-input {
             background: var(--bg-main); border: 1px solid var(--border); color: white;
-            padding: 8px 6px; border-radius: var(--radius-sm); font-size: 0.9rem; text-align: center;
+            padding: 10px 8px; border-radius: var(--radius-sm); font-size: 0.9rem; text-align: center;
             outline: none; transition: border-color 0.2s; font-weight: 700;
         }
         .picker-input:focus { border-color: var(--accent); }
         .picker-input.str-format { 
-            width: 100%; text-align: left; padding-left: 12px; 
+            width: 100%; text-align: left; padding-left: 14px; 
             color: var(--text-muted); font-size: 0.85rem; font-weight: 400;
         }
         .picker-input.str-format:focus { color: var(--text-main); }
@@ -215,31 +227,37 @@
         .multi-inputs { display: flex; gap: 8px; flex: 1; }
         .multi-inputs .picker-input { width: 100%; }
 
-        .standalone-preview {
-            width: 100%; height: 60px; border-radius: var(--radius-md); margin-bottom: 15px;
-            display: flex; justify-content: center; align-items: center; font-weight: 700; font-size: 1.1rem; letter-spacing: 1px;
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1); transition: background-color 0.2s;
+        /* STANDALONE PREVIEW */
+        .standalone-preview-container {
+            width: 100%; height: 155px; border-radius: var(--radius-md); margin-bottom: 18px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1); transition: background-color 0.2s, transform 0.2s;
+            cursor: pointer;
+        }
+        .standalone-preview-container:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255,255,255,0.15);
+        }
+        .standalone-preview-hex {
+            font-size: 2.2rem; font-weight: 700; letter-spacing: 2px; pointer-events: none; transition: color 0.3s ease;
         }
 
         /* ======= STANDALONE BAĞLANTI (LINK) SÜTUNU ======= */
-        .standalone-wrapper {
-            display: flex;
-            gap: 15px;
-        }
+        .standalone-wrapper { display: flex; gap: 18px; }
         .standalone-picker-col { flex: 1; }
         .mixer-link-column {
-            display: flex; flex-direction: column; gap: 12px; align-items: center;
-            background: var(--bg-hover); padding: 15px 12px; border-radius: var(--radius-md);
-            margin-top: 45px; /* Başlık hizasına oturtmak için */
+            display: flex; flex-direction: column; gap: 14px; align-items: center;
+            background: var(--bg-hover); padding: 18px 14px; border-radius: var(--radius-md);
+            margin-top: 50px; 
         }
         .link-buttons-list {
             display: flex; flex-direction: column; gap: 8px;
-            max-height: 400px; overflow-y: auto;
+            max-height: 420px; overflow-y: auto;
         }
         .link-buttons-list::-webkit-scrollbar { display: none; }
         
         .link-btn, .link-add-btn {
-            width: 38px; height: 38px; border-radius: 50%; border: none;
+            width: 42px; height: 42px; border-radius: 50%; border: none;
             font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center;
             transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.15);
             font-size: 1rem;
@@ -251,7 +269,7 @@
         .link-add-btn:hover { background: var(--accent-hover); transform: scale(1.1); }
 
 
-        /* ======= MODAL (MIXER SATIRLARI İÇİN) ======= */
+        /* ======= MODAL ======= */
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);
@@ -260,14 +278,14 @@
         }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
         .color-picker-modal {
-            background: var(--bg-card); padding: 25px; border-radius: var(--radius-lg);
-            width: 100%; max-width: 420px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            background: var(--bg-card); padding: 30px; border-radius: var(--radius-lg);
+            width: 100%; max-width: 460px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             transform: translateY(20px) scale(0.95); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .modal-overlay.active .color-picker-modal { transform: translateY(0) scale(1); }
         
-        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
-        .btn { padding: 10px 18px; border-radius: var(--radius-sm); border: none; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 18px; }
+        .btn { padding: 12px 20px; border-radius: var(--radius-sm); border: none; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: background 0.2s; }
         .btn-cancel { background: var(--bg-main); color: var(--text-main); }
         .btn-cancel:hover { background: var(--border); }
         .btn-save { background: var(--accent); color: white; }
@@ -286,7 +304,7 @@
 </head>
 <body>
 
-    <!-- TEMPLATE: CUSTOM COLOR PICKER (Hem bağımsız hem modal için) -->
+    <!-- TEMPLATE: CUSTOM COLOR PICKER -->
     <template id="picker-template">
         <div class="picker-component-inner">
             <div class="picker-area"><div class="picker-thumb"></div></div>
@@ -371,13 +389,17 @@
         <div class="card standalone-wrapper">
             <div class="standalone-picker-col">
                 <div class="app-title">Bağımsız Ayarlayıcı</div>
-                <div class="standalone-preview" id="standalonePreview" style="background-color: #6366f1; color: white;">#6366F1</div>
+                
+                <div class="standalone-preview-container" id="standalonePreviewContainer" style="background-color: #6366f1;">
+                    <div class="standalone-preview-hex" id="standalonePreviewText">#6366F1</div>
+                    <div class="copy-text" id="standaloneCopyText">Kopyalamak için tıkla</div>
+                </div>
+
                 <div id="standalonePickerContainer">
                     <!-- Template buraya JS ile yüklenecek -->
                 </div>
             </div>
             
-            <!-- Sağdaki İletişim (Link) Sütunu -->
             <div class="mixer-link-column">
                 <button class="link-add-btn" onclick="addNewRowFromStandalone()" title="Bu Rengi Yeni Satır Olarak Ekle">+</button>
                 <div id="linkButtonsContainer" class="link-buttons-list">
@@ -388,7 +410,7 @@
     </div>
 
 
-    <!-- MODAL (Sadece Mixer Satırları İçin) -->
+    <!-- MODAL -->
     <div class="modal-overlay" id="pickerModal">
         <div class="color-picker-modal" onclick="event.stopPropagation()">
             <div id="modalPickerContainer">
@@ -475,7 +497,7 @@
                 weight: row.querySelector('.weight-slider').value
             }));
             undoStack.push(state);
-            if(undoStack.length > 50) undoStack.shift(); // Bellek yönetimi
+            if(undoStack.length > 50) undoStack.shift(); 
         }
 
         function restoreMixerState() {
@@ -484,9 +506,7 @@
                 return;
             }
             const state = undoStack.pop();
-            colorList.innerHTML = ''; // Temizle
-            
-            // Satırları history'den false parametresiyle (geçmişe kaydetmeden) oluştur
+            colorList.innerHTML = ''; 
             state.forEach(item => addColorRow(item.hex, item.weight, false));
             showToast("İşlem geri alındı!");
         }
@@ -553,23 +573,26 @@
                     this.updateAllFromState();
                 };
 
+                // Olay dinleyicileri Window seviyesine çıkarıldı
                 this.area.addEventListener('mousedown', (e) => { isDraggingArea = true; handleAreaMove(e); });
                 this.area.addEventListener('touchstart', (e) => { isDraggingArea = true; handleAreaMove(e); }, {passive: true});
+                
                 this.hueContainer.addEventListener('mousedown', (e) => { isDraggingHue = true; handleHueMove(e); });
                 this.hueContainer.addEventListener('touchstart', (e) => { isDraggingHue = true; handleHueMove(e); }, {passive: true});
                 
                 window.addEventListener('mousemove', (e) => { handleAreaMove(e); handleHueMove(e); });
                 window.addEventListener('touchmove', (e) => { handleAreaMove(e); handleHueMove(e); }, {passive: false});
+                
                 window.addEventListener('mouseup', () => { isDraggingArea = false; isDraggingHue = false; });
                 window.addEventListener('touchend', () => { isDraggingArea = false; isDraggingHue = false; });
 
-                // HEX
+                // HEX GİRDİSİ
                 this.inHex.addEventListener('input', (e) => {
-                    let val = e.target.value.trim();
-                    if(val.startsWith('#')) val = val.substring(1);
+                    let val = e.target.value.replace(/[^0-9A-Fa-f]/g, ''); 
                     if(/^([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(val)) {
                         const rgb = hexToRgb('#' + val);
                         this.setStateFromRgb(rgb.r, rgb.g, rgb.b, 'hex');
+                        e.target.value = '#' + val.toUpperCase();
                     }
                 });
 
@@ -668,22 +691,28 @@
         const colorList = document.getElementById('colorList');
         const resultBox = document.getElementById('resultBox');
         const resultHex = document.getElementById('resultHex');
-        const standalonePreview = document.getElementById('standalonePreview');
+        
+        const standalonePreviewContainer = document.getElementById('standalonePreviewContainer');
+        const standalonePreviewText = document.getElementById('standalonePreviewText');
+        const standaloneCopyText = document.getElementById('standaloneCopyText');
+        
         const linkButtonsContainer = document.getElementById('linkButtonsContainer');
         const toast = document.getElementById('toast');
         let currentResultHex = "#000000";
 
         // BAĞIMSIZ PICKER
         const standalonePicker = new CustomPicker('standalonePickerContainer', (hex, rgb) => {
-            standalonePreview.style.backgroundColor = hex;
-            standalonePreview.textContent = hex;
+            standalonePreviewContainer.style.backgroundColor = hex;
+            standalonePreviewText.textContent = hex;
             const bright = getBrightness(rgb.r, rgb.g, rgb.b);
-            standalonePreview.style.color = bright > 128 ? '#000000' : '#ffffff';
+            const textColor = bright > 128 ? '#000000' : '#ffffff';
+            standalonePreviewText.style.color = textColor;
+            standaloneCopyText.style.color = textColor;
         });
         standalonePicker.setHex('#6366f1');
 
 
-        // MODAL PICKER
+        // MODAL PICKER VE GELİŞMİŞ KAPANMA MANTIĞI
         let activeMixerRowId = null;
         const modalOverlay = document.getElementById('pickerModal');
         const modalPicker = new CustomPicker('modalPickerContainer', (hex, rgb) => {});
@@ -701,11 +730,22 @@
             activeMixerRowId = null;
         }
 
-        modalOverlay.addEventListener('click', closeModal);
+        // Sürükleme esnasında dışarı taşınca Modal'ın yanlışlıkla kapanmasını önleyen mantık
+        let isOverlayMouseDown = false;
+        modalOverlay.addEventListener('mousedown', (e) => {
+            if (e.target === modalOverlay) isOverlayMouseDown = true;
+        });
+        window.addEventListener('mouseup', (e) => {
+            // Sadece tıklama boşlukta başladıysa ve boşlukta bittiyse kapat
+            if (e.target === modalOverlay && isOverlayMouseDown) {
+                closeModal();
+            }
+            isOverlayMouseDown = false;
+        });
 
         function saveModalColor() {
             if(!activeMixerRowId) return;
-            saveMixerState(); // Renk değişmeden önce kaydet
+            saveMixerState(); 
             const row = document.getElementById(activeMixerRowId);
             const hex = modalPicker.getHex();
             
@@ -770,12 +810,11 @@
                 <button class="remove-btn" title="Sil" onclick="removeRow('${rowId}')">×</button>
             `;
 
-            // Olay Dinleyicileri (Sliders)
             const slider = row.querySelector('.weight-slider');
             const number = row.querySelector('.weight-number');
 
             slider.addEventListener('input', (e) => { number.value = e.target.value; mixColors(); });
-            slider.addEventListener('mousedown', () => saveMixerState()); // Değişim öncesi kaydet
+            slider.addEventListener('mousedown', () => saveMixerState()); 
             
             number.addEventListener('input', (e) => {
                 let val = parseInt(e.target.value);
@@ -784,12 +823,11 @@
             });
             number.addEventListener('focus', () => saveMixerState());
 
-            // Doğrudan Hex Düzenleme (Kutu İçi)
+            // Doğrudan Hex Düzenleme
             const mixerHexInp = row.querySelector('.mixer-hex-input');
             mixerHexInp.addEventListener('focus', () => saveMixerState());
             mixerHexInp.addEventListener('input', (e) => {
-                let val = e.target.value.trim();
-                if(val.startsWith('#')) val = val.substring(1);
+                let val = e.target.value.replace(/[^0-9A-Fa-f]/g, ''); 
                 if(/^([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(val)) {
                     const hex = '#' + val.toUpperCase();
                     row.querySelector('.row-hex-val').value = hex;
@@ -798,7 +836,6 @@
                 }
             });
             mixerHexInp.addEventListener('blur', (e) => {
-                // Eğer geçersiz bir şey yazıp çıktıysa, gerçek renge geri dön
                 e.target.value = row.querySelector('.row-hex-val').value;
             });
 
@@ -818,11 +855,10 @@
 
         function addNewRowFromStandalone() {
             saveMixerState();
-            addColorRow(standalonePicker.getHex(), 50, false); // Zaten kaydettik
+            addColorRow(standalonePicker.getHex(), 50, false);
             showToast("Yeni Renk Eklendi!");
         }
 
-        // Link Sütunu (Numaralı Butonlar) Güncellemesi
         function updateLinkButtons() {
             linkButtonsContainer.innerHTML = '';
             const rows = document.querySelectorAll('.color-row');
@@ -846,11 +882,9 @@
             });
         }
 
-
-        // Ön Ayarlar (Presets)
         function applyPreset(type) {
             saveMixerState();
-            colorList.innerHTML = ''; // Temizle
+            colorList.innerHTML = ''; 
             if (type === 1) {
                 addColorRow(getRandomHex(), 100, false);
                 addColorRow(getRandomHex(), 100, false);
@@ -863,7 +897,6 @@
             }
         }
 
-        // Kopyalama & Toast Mesajı
         function showToast(msg = "Panoya kopyalandı!") {
             toast.textContent = msg;
             toast.classList.add('show');
@@ -875,13 +908,12 @@
         }
 
         resultBox.addEventListener('click', () => copyToClipboard(currentResultHex));
-        standalonePreview.addEventListener('click', () => copyToClipboard(standalonePreview.textContent));
+        standalonePreviewContainer.addEventListener('click', () => copyToClipboard(standalonePreviewText.textContent));
 
 
-        // BAŞLANGIÇ ÇALIŞTIRMASI
+        // BAŞLANGIÇ
         addColorRow('#F43F5E', 50, false); 
         addColorRow('#10B981', 50, false);
-        // Silinen undoStack'i başlatma esnasında temiz tutalım
         undoStack = [];
 
     </script>
