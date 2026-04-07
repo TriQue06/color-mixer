@@ -3,450 +3,886 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Color Mixer</title>
+    <title>Color Studio Pro</title>
     <style>
-        /* Font Tanımlaması */
+        /* Product Sans Font Tanımlaması (Globally Hosted) */
         @font-face {
             font-family: 'Product Sans';
-            src: url('ProductSans-Bold.ttf') format('truetype');
-            font-weight: bold;
             font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/productsans/v5/HYvgU2fE2nRJvZ5JFAumwegdm0LZdjqr5-oayXSOefg.woff2) format('woff2');
+        }
+        @font-face {
+            font-family: 'Product Sans';
+            font-style: normal;
+            font-weight: 700;
+            src: url(https://fonts.gstatic.com/s/productsans/v5/HYvgU2fE2nRJvZ5OSFAumwegdm0LZdjqr5-oayXSOefg.woff2) format('woff2');
         }
 
-        /* Genel Ayarlar */
+        :root {
+            --bg-main: #0f0f13;
+            --bg-card: #1c1c24;
+            --bg-hover: #2a2a35;
+            --text-main: #ffffff;
+            --text-muted: #8b8b9d;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --danger: #ef4444;
+            --border: #2a2a35;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Product Sans', sans-serif;
+            font-family: 'Product Sans', system-ui, sans-serif;
         }
 
         body {
-            background-color: #121212;
-            color: #ffffff;
+            background-color: var(--bg-main);
+            color: var(--text-main);
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
-            padding: 20px;
+            padding: 40px 20px;
+            overflow-x: hidden;
         }
 
-        .container {
-            background-color: #1e1e2e;
+        /* Düzen: İki Kolonlu Yapı */
+        .app-wrapper {
+            display: flex;
+            flex-direction: row;
+            gap: 30px;
+            width: 100%;
+            max-width: 1100px;
+            align-items: flex-start;
+        }
+
+        @media (max-width: 900px) {
+            .app-wrapper { flex-direction: column; align-items: center; }
+        }
+
+        /* Kart Yapısı */
+        .card {
+            background-color: var(--bg-card);
             padding: 30px;
-            border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
             width: 100%;
-            max-width: 550px;
+            flex: 1;
         }
 
-        /* Sonuç Gösterim Alanı */
-        .result-box {
-            width: 100%;
-            height: 150px;
-            border-radius: 16px;
-            background-color: #000000;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin-bottom: 30px;
-            position: relative;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
-        }
-
-        .result-box:hover {
-            transform: scale(1.02);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .result-hex {
-            font-size: 2rem;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-            letter-spacing: 2px;
-            pointer-events: none;
-        }
-
-        .copy-text {
-            font-size: 0.9rem;
-            opacity: 0.7;
-            margin-top: 5px;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-            pointer-events: none;
-        }
-
-        /* Renk Satırları */
-        .color-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 20px;
-            max-height: 350px;
-            overflow-y: auto;
-            padding-right: 5px;
-        }
-
-        /* Scrollbar Özelleştirme */
-        .color-list::-webkit-scrollbar { width: 6px; }
-        .color-list::-webkit-scrollbar-thumb { background-color: #3b3b54; border-radius: 10px; }
-
-        .color-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background-color: #2a2a3f;
-            padding: 15px;
-            border-radius: 12px;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Renk Seçici Buton (Sistem) */
-        input[type="color"] {
-            -webkit-appearance: none;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            padding: 0;
-            background: none;
-            flex-shrink: 0;
-        }
-        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-        input[type="color"]::-webkit-color-swatch { border: 2px solid #ffffff33; border-radius: 50%; }
-
-        /* Hex Metin Kutusu */
-        .hex-input {
-            background: #1e1e2e;
-            border: 2px solid transparent;
-            color: white;
-            padding: 8px 10px;
-            border-radius: 8px;
-            width: 85px;
-            font-size: 0.9rem;
+        .app-title {
             text-align: center;
-            outline: none;
-            transition: border-color 0.2s, background-color 0.2s;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
             text-transform: uppercase;
         }
-        .hex-input:focus {
-            border-color: #8888ff;
-            background: #2a2a3f;
+
+        /* ======= MIXER (KARIŞTIRICI) BÖLÜMÜ ======= */
+        .result-box {
+            width: 100%; height: 140px; border-radius: var(--radius-md);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-bottom: 20px; position: relative; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
+        }
+        .result-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255,255,255,0.15);
+        }
+        .result-hex { font-size: 2.2rem; font-weight: 700; letter-spacing: 2px; pointer-events: none; transition: color 0.3s ease; }
+        .copy-text { font-size: 0.85rem; opacity: 0.8; margin-top: 8px; pointer-events: none; transition: color 0.3s ease; }
+
+        /* Ön Ayarlar (Presets) */
+        .presets-container { display: flex; gap: 10px; margin-bottom: 20px; }
+        .preset-btn {
+            flex: 1; background: var(--bg-hover); color: var(--text-main); border: 1px solid var(--border);
+            padding: 8px 5px; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 700;
+            cursor: pointer; transition: all 0.2s; text-align: center;
+        }
+        .preset-btn:hover { background: var(--accent); border-color: var(--accent); }
+
+        /* Renk Listesi */
+        .color-list {
+            display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;
+            max-height: 380px; overflow-y: auto; padding-right: 5px;
+        }
+        .color-list::-webkit-scrollbar { width: 6px; }
+        .color-list::-webkit-scrollbar-thumb { background-color: var(--border); border-radius: 10px; }
+
+        .color-row {
+            display: flex; align-items: center; gap: 12px; background-color: var(--bg-hover);
+            padding: 10px 15px; border-radius: var(--radius-md); animation: fadeIn 0.3s ease;
         }
 
-        /* Slider */
-        input[type="range"] {
-            flex-grow: 1;
-            accent-color: #8888ff;
-            cursor: pointer;
-            min-width: 50px;
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* KARE SWATCH TASARIMI */
+        .color-swatch {
+            width: 45px; height: 45px; border-radius: 12px;
+            cursor: pointer; border: 2px solid rgba(255,255,255,0.2);
+            flex-shrink: 0; transition: transform 0.1s; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .color-swatch:hover { transform: scale(1.05); border-color: rgba(255,255,255,0.5); }
+
+        /* DÜZENLENEBİLİR HEX KUTUSU */
+        .mixer-hex-input {
+            background: var(--bg-main); border: 1px solid var(--border);
+            color: var(--text-main); border-radius: var(--radius-sm);
+            width: 80px; padding: 6px; text-align: center; font-size: 0.95rem;
+            outline: none; font-weight: 700; transition: border-color 0.2s;
+        }
+        .mixer-hex-input:focus { border-color: var(--accent); }
+
+        input[type="range"].weight-slider {
+            flex-grow: 1; accent-color: var(--accent); cursor: pointer; height: 6px;
+            background: var(--bg-main); border-radius: 3px; -webkit-appearance: none;
+        }
+        input[type="range"].weight-slider::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 14px; height: 14px; background: var(--accent); border-radius: 50%;
         }
 
-        /* Yüzde Input */
         .weight-input-wrapper {
-            display: flex;
-            align-items: center;
-            background: #1e1e2e;
-            border-radius: 8px;
-            padding: 5px 10px;
-            flex-shrink: 0;
+            display: flex; align-items: center; background: var(--bg-main); border-radius: var(--radius-sm);
+            padding: 5px; width: 55px; border: 1px solid transparent; transition: border-color 0.2s;
         }
-
-        input[type="number"] {
-            background: transparent;
-            border: none;
-            color: white;
-            width: 40px;
-            font-size: 1rem;
-            text-align: right;
-            outline: none;
-            -moz-appearance: textfield;
-        }
-        input[type="number"]::-webkit-outer-spin-button,
-        input[type="number"]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
+        .weight-input-wrapper:focus-within { border-color: var(--accent); }
+        .weight-input-wrapper input {
+            background: transparent; border: none; color: white; width: 100%; font-size: 0.9rem;
+            text-align: center; outline: none; font-weight: 700;
         }
         
-        .percent-sign {
-            margin-left: 2px;
-            color: #888;
-        }
-
-        /* Silme Butonu */
         .remove-btn {
-            background: transparent;
-            border: none;
-            color: #ff5555;
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: color 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 30px;
-            height: 30px;
-            flex-shrink: 0;
+            background: transparent; border: none; color: var(--text-muted); font-size: 1.4rem;
+            cursor: pointer; transition: color 0.2s; width: 28px; height: 28px; border-radius: var(--radius-sm);
         }
-        .remove-btn:hover { color: #ff2222; }
+        .remove-btn:hover { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
 
-        /* Ekleme Butonu */
         .add-btn {
-            width: 100%;
-            background-color: #3b3b54;
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
+            width: 100%; background-color: transparent; color: var(--accent); border: 2px dashed var(--border);
+            padding: 12px; border-radius: var(--radius-md); font-size: 0.95rem; font-weight: 700;
+            cursor: pointer; transition: all 0.2s; display: flex; justify-content: center; gap: 10px;
+        }
+        .add-btn:hover { border-color: var(--accent); background: rgba(99, 102, 241, 0.05); }
+
+
+        /* ======= CUSTOM COLOR PICKER COMPONENT ======= */
+        .picker-area {
+            width: 100%; height: 160px; border-radius: var(--radius-sm); position: relative;
+            cursor: crosshair; margin-bottom: 15px; background-color: red;
+            background-image: linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, transparent);
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.2); overflow: hidden;
+        }
+        .picker-thumb {
+            width: 16px; height: 16px; border-radius: 50%; border: 2px solid white;
+            box-shadow: 0 0 4px rgba(0,0,0,0.5); position: absolute; transform: translate(-50%, -50%); pointer-events: none;
+        }
+        .hue-slider-container {
+            width: 100%; height: 16px; border-radius: 8px;
+            background: linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
+            position: relative; margin-bottom: 20px; cursor: pointer;
+        }
+        .hue-thumb {
+            width: 20px; height: 20px; background: white; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+            position: absolute; top: 50%; transform: translate(-50%, -50%); pointer-events: none;
+        }
+        
+        /* Girdiler - YENİ FERAHLATILMIŞ DÜZEN */
+        .picker-inputs { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
+        .input-group { display: flex; flex-direction: column; gap: 8px; }
+        .input-row { display: flex; align-items: center; gap: 10px; width: 100%; }
+        .input-label { width: 45px; font-size: 0.85rem; color: var(--text-muted); font-weight: 700; letter-spacing: 0.5px;}
+        
+        .picker-input {
+            background: var(--bg-main); border: 1px solid var(--border); color: white;
+            padding: 8px 6px; border-radius: var(--radius-sm); font-size: 0.9rem; text-align: center;
+            outline: none; transition: border-color 0.2s; font-weight: 700;
+        }
+        .picker-input:focus { border-color: var(--accent); }
+        .picker-input.str-format { 
+            width: 100%; text-align: left; padding-left: 12px; 
+            color: var(--text-muted); font-size: 0.85rem; font-weight: 400;
+        }
+        .picker-input.str-format:focus { color: var(--text-main); }
+        
+        .multi-inputs { display: flex; gap: 8px; flex: 1; }
+        .multi-inputs .picker-input { width: 100%; }
+
+        .standalone-preview {
+            width: 100%; height: 60px; border-radius: var(--radius-md); margin-bottom: 15px;
+            display: flex; justify-content: center; align-items: center; font-weight: 700; font-size: 1.1rem; letter-spacing: 1px;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1); transition: background-color 0.2s;
+        }
+
+        /* ======= STANDALONE BAĞLANTI (LINK) SÜTUNU ======= */
+        .standalone-wrapper {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
+            gap: 15px;
         }
-
-        .add-btn:hover { background-color: #4a4a6a; }
-
-        /* Toast Bildirimi (Kopyalandı) */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            background-color: #4caf50;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 30px;
+        .standalone-picker-col { flex: 1; }
+        .mixer-link-column {
+            display: flex; flex-direction: column; gap: 12px; align-items: center;
+            background: var(--bg-hover); padding: 15px 12px; border-radius: var(--radius-md);
+            margin-top: 45px; /* Başlık hizasına oturtmak için */
+        }
+        .link-buttons-list {
+            display: flex; flex-direction: column; gap: 8px;
+            max-height: 400px; overflow-y: auto;
+        }
+        .link-buttons-list::-webkit-scrollbar { display: none; }
+        
+        .link-btn, .link-add-btn {
+            width: 38px; height: 38px; border-radius: 50%; border: none;
+            font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center;
+            transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.15);
             font-size: 1rem;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.3s, transform 0.3s;
-            pointer-events: none;
         }
-        .toast.show {
-            opacity: 1;
-            transform: translateY(0);
+        .link-btn { background: var(--bg-main); color: var(--text-muted); }
+        .link-btn:hover { background: var(--accent); color: white; transform: scale(1.1); }
+        
+        .link-add-btn { background: var(--accent); color: white; font-size: 1.5rem; padding-bottom: 2px; }
+        .link-add-btn:hover { background: var(--accent-hover); transform: scale(1.1); }
+
+
+        /* ======= MODAL (MIXER SATIRLARI İÇİN) ======= */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.2s;
         }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+        .color-picker-modal {
+            background: var(--bg-card); padding: 25px; border-radius: var(--radius-lg);
+            width: 100%; max-width: 420px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transform: translateY(20px) scale(0.95); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal-overlay.active .color-picker-modal { transform: translateY(0) scale(1); }
+        
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
+        .btn { padding: 10px 18px; border-radius: var(--radius-sm); border: none; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+        .btn-cancel { background: var(--bg-main); color: var(--text-main); }
+        .btn-cancel:hover { background: var(--border); }
+        .btn-save { background: var(--accent); color: white; }
+        .btn-save:hover { background: var(--accent-hover); }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 30px; background-color: var(--text-main); color: var(--bg-main);
+            padding: 12px 24px; border-radius: 30px; font-size: 0.95rem; font-weight: 700;
+            opacity: 0; transform: translateY(20px); transition: all 0.3s; pointer-events: none;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 2000;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
 
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="result-box" id="resultBox">
-            <div class="result-hex" id="resultHex">#000000</div>
-            <div class="copy-text" id="copyText">Kopyalamak için tıkla</div>
+    <!-- TEMPLATE: CUSTOM COLOR PICKER (Hem bağımsız hem modal için) -->
+    <template id="picker-template">
+        <div class="picker-component-inner">
+            <div class="picker-area"><div class="picker-thumb"></div></div>
+            <div class="hue-slider-container"><div class="hue-thumb"></div></div>
+            <div class="picker-inputs">
+                <!-- HEX -->
+                <div class="input-group">
+                    <div class="input-row">
+                        <span class="input-label">HEX</span>
+                        <input type="text" class="picker-input in-hex" placeholder="#FFFFFF" style="width: 100%;">
+                    </div>
+                </div>
+                <!-- RGB -->
+                <div class="input-group">
+                    <div class="input-row">
+                        <span class="input-label">RGB</span>
+                        <div class="multi-inputs">
+                            <input type="number" class="picker-input in-r" min="0" max="255">
+                            <input type="number" class="picker-input in-g" min="0" max="255">
+                            <input type="number" class="picker-input in-b" min="0" max="255">
+                        </div>
+                    </div>
+                    <input type="text" class="picker-input str-format str-rgb" placeholder="rgb(0, 0, 0)">
+                </div>
+                <!-- HSL (step=5) -->
+                <div class="input-group">
+                    <div class="input-row">
+                        <span class="input-label">HSL</span>
+                        <div class="multi-inputs">
+                            <input type="number" class="picker-input in-h" min="0" max="360">
+                            <input type="number" class="picker-input in-s" min="0" max="100" step="5">
+                            <input type="number" class="picker-input in-l" min="0" max="100" step="5">
+                        </div>
+                    </div>
+                    <input type="text" class="picker-input str-format str-hsl" placeholder="hsl(0, 0%, 0%)">
+                </div>
+                <!-- CMYK (step=5) -->
+                <div class="input-group">
+                    <div class="input-row">
+                        <span class="input-label">CMYK</span>
+                        <div class="multi-inputs">
+                            <input type="number" class="picker-input in-c" min="0" max="100" step="5">
+                            <input type="number" class="picker-input in-m" min="0" max="100" step="5">
+                            <input type="number" class="picker-input in-y" min="0" max="100" step="5">
+                            <input type="number" class="picker-input in-k" min="0" max="100" step="5">
+                        </div>
+                    </div>
+                    <input type="text" class="picker-input str-format str-cmyk" placeholder="cmyk(0%, 0%, 0%, 0%)">
+                </div>
+            </div>
         </div>
+    </template>
 
-        <div class="color-list" id="colorList">
+
+    <div class="app-wrapper">
+        <!-- SOL KOLON: KARIŞTIRICI (MIXER) -->
+        <div class="card">
+            <div class="app-title">Color Mixer</div>
+            
+            <div class="result-box" id="resultBox">
+                <div class="result-hex" id="resultHex">#000000</div>
+                <div class="copy-text" id="copyText">Kopyalamak için tıkla</div>
             </div>
 
-        <button class="add-btn" onclick="addColorRow('#FFFFFF', 50, true)">
-            <span>+</span> Yeni Renk Ekle
-        </button>
+            <!-- Preset Butonları -->
+            <div class="presets-container">
+                <button class="preset-btn" onclick="applyPreset(1)">Rastgele (x2)</button>
+                <button class="preset-btn" onclick="applyPreset(2)">Rastgele + %75 Beyaz</button>
+                <button class="preset-btn" onclick="applyPreset(3)">Rastgele + %25 Beyaz</button>
+            </div>
+
+            <div class="color-list" id="colorList">
+                <!-- Renk satırları buraya gelecek -->
+            </div>
+
+            <button class="add-btn" onclick="addNewRowFromButton()">
+                + Yeni Renk Karışımı Ekle
+            </button>
+        </div>
+
+        <!-- SAĞ KOLON: BAĞIMSIZ COLOR PICKER & LINK BÖLÜMÜ -->
+        <div class="card standalone-wrapper">
+            <div class="standalone-picker-col">
+                <div class="app-title">Bağımsız Ayarlayıcı</div>
+                <div class="standalone-preview" id="standalonePreview" style="background-color: #6366f1; color: white;">#6366F1</div>
+                <div id="standalonePickerContainer">
+                    <!-- Template buraya JS ile yüklenecek -->
+                </div>
+            </div>
+            
+            <!-- Sağdaki İletişim (Link) Sütunu -->
+            <div class="mixer-link-column">
+                <button class="link-add-btn" onclick="addNewRowFromStandalone()" title="Bu Rengi Yeni Satır Olarak Ekle">+</button>
+                <div id="linkButtonsContainer" class="link-buttons-list">
+                    <!-- Yuvarlak Butonlar Gelecek -->
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="toast" id="toast">Hex kodu kopyalandı!</div>
+
+    <!-- MODAL (Sadece Mixer Satırları İçin) -->
+    <div class="modal-overlay" id="pickerModal">
+        <div class="color-picker-modal" onclick="event.stopPropagation()">
+            <div id="modalPickerContainer">
+                <!-- Template buraya JS ile yüklenecek -->
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeModal()">İptal</button>
+                <button class="btn btn-save" onclick="saveModalColor()">Uygula</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">İşlem başarılı!</div>
+
 
     <script>
+        /* =========================================
+           RENK MATEMATİĞİ FONKSİYONLARI 
+           ========================================= */
+        function hsvToRgb(h, s, v) {
+            s /= 100; v /= 100;
+            let f = (n, k = (n + h / 60) % 6) => v - v * s * Math.max(Math.min(k, 4 - k, 1), 0);
+            return { r: Math.round(f(5) * 255), g: Math.round(f(3) * 255), b: Math.round(f(1) * 255) };
+        }
+        function rgbToHsv(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            let v = Math.max(r, g, b), c = v - Math.min(r, g, b);
+            let h = c && ((v === r) ? (g - b) / c : ((v === g) ? 2 + (b - r) / c : 4 + (r - g) / c));
+            return { h: Math.round(60 * (h < 0 ? h + 6 : h)) || 0, s: Math.round(v && c / v * 100), v: Math.round(v * 100) };
+        }
+        function rgbToHex(r, g, b) {
+            return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1).toUpperCase();
+        }
+        function hexToRgb(hex) {
+            hex = hex.replace(/^#/, '');
+            if(hex.length === 3) hex = hex.split('').map(c => c+c).join('');
+            let num = parseInt(hex, 16);
+            return { r: num >> 16, g: (num >> 8) & 255, b: num & 255 };
+        }
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            let max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            if (max === min) { h = s = 0; } 
+            else {
+                let d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) { case r: h = (g - b) / d + (g < b ? 6 : 0); break; case g: h = (b - r) / d + 2; break; case b: h = (r - g) / d + 4; break; }
+                h /= 6;
+            }
+            return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+        }
+        function hslToRgb(h, s, l) {
+            s /= 100; l /= 100;
+            let k = n => (n + h / 30) % 12; let a = s * Math.min(l, 1 - l);
+            let f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+            return { r: Math.round(255 * f(0)), g: Math.round(255 * f(8)), b: Math.round(255 * f(4)) };
+        }
+        function rgbToCmyk(r, g, b) {
+            let r_ = r / 255, g_ = g / 255, b_ = b / 255;
+            let k = 1 - Math.max(r_, g_, b_);
+            if (k === 1) return { c: 0, m: 0, y: 0, k: 100 };
+            let c = (1 - r_ - k) / (1 - k), m = (1 - g_ - k) / (1 - k), y = (1 - b_ - k) / (1 - k);
+            return { c: Math.round(c * 100), m: Math.round(m * 100), y: Math.round(y * 100), k: Math.round(k * 100) };
+        }
+        function cmykToRgb(c, m, y, k) {
+            c /= 100; m /= 100; y /= 100; k /= 100;
+            let r = 255 * (1 - c) * (1 - k), g = 255 * (1 - m) * (1 - k), b = 255 * (1 - y) * (1 - k);
+            return { r: Math.round(r), g: Math.round(g), b: Math.round(b) };
+        }
+        function getBrightness(r, g, b) { return (r * 299 + g * 587 + b * 114) / 1000; }
+        function getRandomHex() { return '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0').toUpperCase(); }
+
+
+        /* =========================================
+           CTRL+Z (GERİ ALMA) SİSTEMİ
+           ========================================= */
+        let undoStack = [];
+
+        function saveMixerState() {
+            const rows = document.querySelectorAll('.color-row');
+            const state = Array.from(rows).map(row => ({
+                hex: row.querySelector('.row-hex-val').value,
+                weight: row.querySelector('.weight-slider').value
+            }));
+            undoStack.push(state);
+            if(undoStack.length > 50) undoStack.shift(); // Bellek yönetimi
+        }
+
+        function restoreMixerState() {
+            if (undoStack.length === 0) {
+                showToast("Geri alınacak işlem yok!");
+                return;
+            }
+            const state = undoStack.pop();
+            colorList.innerHTML = ''; // Temizle
+            
+            // Satırları history'den false parametresiyle (geçmişe kaydetmeden) oluştur
+            state.forEach(item => addColorRow(item.hex, item.weight, false));
+            showToast("İşlem geri alındı!");
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key.toLowerCase() === 'z') {
+                e.preventDefault();
+                restoreMixerState();
+            }
+        });
+
+
+        /* =========================================
+           CUSTOM COLOR PICKER CLASS
+           ========================================= */
+        class CustomPicker {
+            constructor(containerId, onColorChange) {
+                this.container = document.getElementById(containerId);
+                this.onColorChange = onColorChange || function(){};
+                
+                const template = document.getElementById('picker-template');
+                this.container.appendChild(template.content.cloneNode(true));
+
+                this.p_h = 0; this.p_s = 100; this.p_v = 100;
+                this.bindElements();
+                this.bindEvents();
+            }
+
+            bindElements() {
+                this.area = this.container.querySelector('.picker-area');
+                this.areaThumb = this.container.querySelector('.picker-thumb');
+                this.hueContainer = this.container.querySelector('.hue-slider-container');
+                this.hueThumb = this.container.querySelector('.hue-thumb');
+
+                this.inHex = this.container.querySelector('.in-hex');
+                this.inR = this.container.querySelector('.in-r'); this.inG = this.container.querySelector('.in-g'); this.inB = this.container.querySelector('.in-b');
+                this.strRgb = this.container.querySelector('.str-rgb');
+
+                this.inH = this.container.querySelector('.in-h'); this.inS = this.container.querySelector('.in-s'); this.inL = this.container.querySelector('.in-l');
+                this.strHsl = this.container.querySelector('.str-hsl');
+
+                this.inC = this.container.querySelector('.in-c'); this.inM = this.container.querySelector('.in-m'); this.inY = this.container.querySelector('.in-y'); this.inK = this.container.querySelector('.in-k');
+                this.strCmyk = this.container.querySelector('.str-cmyk');
+            }
+
+            bindEvents() {
+                let isDraggingArea = false, isDraggingHue = false;
+                
+                const handleAreaMove = (e) => {
+                    if (!isDraggingArea) return;
+                    const rect = this.area.getBoundingClientRect();
+                    let x = e.clientX ?? e.touches[0].clientX; let y = e.clientY ?? e.touches[0].clientY;
+                    x = Math.max(0, Math.min(x - rect.left, rect.width)); y = Math.max(0, Math.min(y - rect.top, rect.height));
+                    this.p_s = Math.round((x / rect.width) * 100); this.p_v = Math.round(100 - (y / rect.height) * 100);
+                    this.updateAllFromState();
+                };
+
+                const handleHueMove = (e) => {
+                    if (!isDraggingHue) return;
+                    const rect = this.hueContainer.getBoundingClientRect();
+                    let x = e.clientX ?? e.touches[0].clientX;
+                    x = Math.max(0, Math.min(x - rect.left, rect.width));
+                    this.p_h = Math.round((x / rect.width) * 360); if(this.p_h === 360) this.p_h = 0;
+                    this.updateAllFromState();
+                };
+
+                this.area.addEventListener('mousedown', (e) => { isDraggingArea = true; handleAreaMove(e); });
+                this.area.addEventListener('touchstart', (e) => { isDraggingArea = true; handleAreaMove(e); }, {passive: true});
+                this.hueContainer.addEventListener('mousedown', (e) => { isDraggingHue = true; handleHueMove(e); });
+                this.hueContainer.addEventListener('touchstart', (e) => { isDraggingHue = true; handleHueMove(e); }, {passive: true});
+                
+                window.addEventListener('mousemove', (e) => { handleAreaMove(e); handleHueMove(e); });
+                window.addEventListener('touchmove', (e) => { handleAreaMove(e); handleHueMove(e); }, {passive: false});
+                window.addEventListener('mouseup', () => { isDraggingArea = false; isDraggingHue = false; });
+                window.addEventListener('touchend', () => { isDraggingArea = false; isDraggingHue = false; });
+
+                // HEX
+                this.inHex.addEventListener('input', (e) => {
+                    let val = e.target.value.trim();
+                    if(val.startsWith('#')) val = val.substring(1);
+                    if(/^([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(val)) {
+                        const rgb = hexToRgb('#' + val);
+                        this.setStateFromRgb(rgb.r, rgb.g, rgb.b, 'hex');
+                    }
+                });
+
+                // RGB Numaralar
+                const rgbNumChange = () => {
+                    let r = parseInt(this.inR.value)||0, g = parseInt(this.inG.value)||0, b = parseInt(this.inB.value)||0;
+                    this.setStateFromRgb(r, g, b, 'rgb');
+                };
+                this.inR.addEventListener('input', rgbNumChange); this.inG.addEventListener('input', rgbNumChange); this.inB.addEventListener('input', rgbNumChange);
+
+                // HSL Numaralar
+                const hslNumChange = () => {
+                    let h = parseInt(this.inH.value)||0, s = parseInt(this.inS.value)||0, l = parseInt(this.inL.value)||0;
+                    const rgb = hslToRgb(h, s, l);
+                    this.setStateFromRgb(rgb.r, rgb.g, rgb.b, 'hsl');
+                };
+                this.inH.addEventListener('input', hslNumChange); this.inS.addEventListener('input', hslNumChange); this.inL.addEventListener('input', hslNumChange);
+
+                // CMYK Numaralar
+                const cmykNumChange = () => {
+                    let c = parseInt(this.inC.value)||0, m = parseInt(this.inM.value)||0, y = parseInt(this.inY.value)||0, k = parseInt(this.inK.value)||0;
+                    const rgb = cmykToRgb(c, m, y, k);
+                    this.setStateFromRgb(rgb.r, rgb.g, rgb.b, 'cmyk');
+                };
+                this.inC.addEventListener('input', cmykNumChange); this.inM.addEventListener('input', cmykNumChange); this.inY.addEventListener('input', cmykNumChange); this.inK.addEventListener('input', cmykNumChange);
+
+                // FORMAT STRING
+                this.strRgb.addEventListener('input', (e) => {
+                    const match = e.target.value.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i);
+                    if(match) this.setStateFromRgb(parseInt(match[1]), parseInt(match[2]), parseInt(match[3]), 'str-rgb');
+                });
+                this.strHsl.addEventListener('input', (e) => {
+                    const match = e.target.value.match(/hsl\(\s*(\d+)\s*,\s*(\d+)%?\s*,\s*(\d+)%?\s*\)/i);
+                    if(match) {
+                        const rgb = hslToRgb(parseInt(match[1]), parseInt(match[2]), parseInt(match[3]));
+                        this.setStateFromRgb(rgb.r, rgb.g, rgb.b, 'str-hsl');
+                    }
+                });
+                this.strCmyk.addEventListener('input', (e) => {
+                    const match = e.target.value.match(/cmyk\(\s*(\d+)%?\s*,\s*(\d+)%?\s*,\s*(\d+)%?\s*,\s*(\d+)%?\s*\)/i);
+                    if(match) {
+                        const rgb = cmykToRgb(parseInt(match[1]), parseInt(match[2]), parseInt(match[3]), parseInt(match[4]));
+                        this.setStateFromRgb(rgb.r, rgb.g, rgb.b, 'str-cmyk');
+                    }
+                });
+            }
+
+            setStateFromRgb(r, g, b, excludeSource = null) {
+                r = Math.min(255, Math.max(0, r)); g = Math.min(255, Math.max(0, g)); b = Math.min(255, Math.max(0, b));
+                const hsv = rgbToHsv(r, g, b);
+                this.p_h = hsv.h; this.p_s = hsv.s; this.p_v = hsv.v;
+                this.updateAllFromState(excludeSource);
+            }
+
+            setHex(hexColor) {
+                const rgb = hexToRgb(hexColor);
+                this.setStateFromRgb(rgb.r, rgb.g, rgb.b);
+            }
+
+            getHex() {
+                const rgb = hsvToRgb(this.p_h, this.p_s, this.p_v);
+                return rgbToHex(rgb.r, rgb.g, rgb.b);
+            }
+
+            updateAllFromState(excludeSource = null) {
+                this.area.style.backgroundColor = `hsl(${this.p_h}, 100%, 50%)`;
+                this.areaThumb.style.left = `${this.p_s}%`; this.areaThumb.style.top = `${100 - this.p_v}%`;
+                this.hueThumb.style.left = `${(this.p_h / 360) * 100}%`;
+                
+                const rgb = hsvToRgb(this.p_h, this.p_s, this.p_v);
+                const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+                const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+                const cmyk = rgbToCmyk(rgb.r, rgb.g, rgb.b);
+
+                this.areaThumb.style.backgroundColor = hex;
+
+                if(excludeSource !== 'hex') this.inHex.value = hex;
+                
+                if(excludeSource !== 'rgb') { this.inR.value = rgb.r; this.inG.value = rgb.g; this.inB.value = rgb.b; }
+                if(excludeSource !== 'str-rgb') this.strRgb.value = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+
+                if(excludeSource !== 'hsl') { this.inH.value = hsl.h; this.inS.value = hsl.s; this.inL.value = hsl.l; }
+                if(excludeSource !== 'str-hsl') this.strHsl.value = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+
+                if(excludeSource !== 'cmyk') { this.inC.value = cmyk.c; this.inM.value = cmyk.m; this.inY.value = cmyk.y; this.inK.value = cmyk.k; }
+                if(excludeSource !== 'str-cmyk') this.strCmyk.value = `cmyk(${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%)`;
+
+                this.onColorChange(hex, rgb);
+            }
+        }
+
+
+        /* =========================================
+           UYGULAMA BAŞLATMA VE BAĞLANTILAR
+           ========================================= */
         const colorList = document.getElementById('colorList');
         const resultBox = document.getElementById('resultBox');
         const resultHex = document.getElementById('resultHex');
+        const standalonePreview = document.getElementById('standalonePreview');
+        const linkButtonsContainer = document.getElementById('linkButtonsContainer');
         const toast = document.getElementById('toast');
-        let currentHex = "#000000";
+        let currentResultHex = "#000000";
 
-        // Hex'i RGB'ye çevir
-        function hexToRgb(hex) {
-            // Kısa hex (#FFF) formatını uzun formata (#FFFFFF) çevir
-            if (hex.length === 4) {
-                hex = '#' + hex[1] + hex[1] + hex[2] + hex[2] + hex[3] + hex[3];
-            }
-            const r = parseInt(hex.slice(1, 3), 16) || 0;
-            const g = parseInt(hex.slice(3, 5), 16) || 0;
-            const b = parseInt(hex.slice(5, 7), 16) || 0;
-            return { r, g, b };
+        // BAĞIMSIZ PICKER
+        const standalonePicker = new CustomPicker('standalonePickerContainer', (hex, rgb) => {
+            standalonePreview.style.backgroundColor = hex;
+            standalonePreview.textContent = hex;
+            const bright = getBrightness(rgb.r, rgb.g, rgb.b);
+            standalonePreview.style.color = bright > 128 ? '#000000' : '#ffffff';
+        });
+        standalonePicker.setHex('#6366f1');
+
+
+        // MODAL PICKER
+        let activeMixerRowId = null;
+        const modalOverlay = document.getElementById('pickerModal');
+        const modalPicker = new CustomPicker('modalPickerContainer', (hex, rgb) => {});
+
+        function openModal(rowId) {
+            activeMixerRowId = rowId;
+            const row = document.getElementById(rowId);
+            const currentHex = row.querySelector('.row-hex-val').value;
+            modalPicker.setHex(currentHex);
+            modalOverlay.classList.add('active');
         }
 
-        // RGB'yi Hex'e çevir
-        function rgbToHex(r, g, b) {
-            const toHex = (c) => {
-                const hex = Math.round(c).toString(16);
-                return hex.length === 1 ? "0" + hex : hex;
-            };
-            return "#" + toHex(r) + toHex(g) + toHex(b);
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+            activeMixerRowId = null;
         }
 
-        // Parlaklık hesabı
-        function getBrightness(r, g, b) {
-            return (r * 299 + g * 587 + b * 114) / 1000;
+        modalOverlay.addEventListener('click', closeModal);
+
+        function saveModalColor() {
+            if(!activeMixerRowId) return;
+            saveMixerState(); // Renk değişmeden önce kaydet
+            const row = document.getElementById(activeMixerRowId);
+            const hex = modalPicker.getHex();
+            
+            row.querySelector('.row-hex-val').value = hex;
+            row.querySelector('.mixer-hex-input').value = hex;
+            row.querySelector('.color-swatch').style.backgroundColor = hex;
+            
+            mixColors();
+            closeModal();
         }
 
-        // Renkleri Karıştır
+        /* =========================================
+           KARIŞTIRICI (MIXER) MANTIĞI
+           ========================================= */
         function mixColors() {
-            let totalWeight = 0;
-            let totalR = 0, totalG = 0, totalB = 0;
-
+            let totalWeight = 0; let totalR = 0, totalG = 0, totalB = 0;
             const rows = document.querySelectorAll('.color-row');
 
             rows.forEach(row => {
-                const hexValue = row.querySelector('.hex-input').value;
-                const weightValue = parseFloat(row.querySelector('.number-input').value) || 0;
-
-                // Sadece geçerli uzunluktaki hex kodlarını işleme dahil et
-                if (hexValue.length === 7 || hexValue.length === 4) {
-                    const { r, g, b } = hexToRgb(hexValue);
-                    totalR += r * weightValue;
-                    totalG += g * weightValue;
-                    totalB += b * weightValue;
-                    totalWeight += weightValue;
-                }
+                const hexValue = row.querySelector('.row-hex-val').value;
+                const weightValue = parseFloat(row.querySelector('.weight-slider').value) || 0;
+                const { r, g, b } = hexToRgb(hexValue);
+                totalR += r * weightValue; totalG += g * weightValue; totalB += b * weightValue;
+                totalWeight += weightValue;
             });
 
-            if (totalWeight === 0) {
-                updateResultBox(0, 0, 0); 
-            } else {
-                updateResultBox(
-                    totalR / totalWeight,
-                    totalG / totalWeight,
-                    totalB / totalWeight
-                );
-            }
+            if (totalWeight === 0) { updateResultBox(0, 0, 0); } 
+            else { updateResultBox(totalR / totalWeight, totalG / totalWeight, totalB / totalWeight); }
+            
+            updateLinkButtons();
         }
 
-        // Sonuç Kutusunu Güncelle
         function updateResultBox(r, g, b) {
-            currentHex = rgbToHex(r, g, b).toUpperCase();
-            resultBox.style.backgroundColor = currentHex;
-            resultHex.textContent = currentHex;
-
+            currentResultHex = rgbToHex(r, g, b);
+            resultBox.style.backgroundColor = currentResultHex;
+            resultHex.textContent = currentResultHex;
             const brightness = getBrightness(r, g, b);
             const textColor = brightness > 128 ? '#000000' : '#ffffff';
             resultHex.style.color = textColor;
             document.getElementById('copyText').style.color = textColor;
         }
 
-        // Yeni Renk Satırı Ekle
-        function addColorRow(defaultColor = '#8888FF', defaultWeight = 50, focusHex = false) {
+        function generateId() { return 'row_' + Math.random().toString(36).substr(2, 9); }
+
+        function addColorRow(defaultHex = '#6366f1', defaultWeight = 50, pushHistory = true) {
+            if (pushHistory) saveMixerState();
+
+            const rowId = generateId();
             const row = document.createElement('div');
-            row.className = 'color-row';
+            row.className = 'color-row'; row.id = rowId;
 
             row.innerHTML = `
-                <input type="color" class="color-picker" value="${defaultColor}">
-                <input type="text" class="hex-input" value="${defaultColor}" maxlength="7">
-                <input type="range" class="range-input" min="0" max="100" value="${defaultWeight}">
+                <input type="hidden" class="row-hex-val" value="${defaultHex}">
+                <div class="color-swatch" style="background-color: ${defaultHex}" onclick="openModal('${rowId}')" title="Gelişmiş Düzenle"></div>
+                
+                <input type="text" class="mixer-hex-input" value="${defaultHex}" maxlength="7" title="Hızlı Düzenle">
+                
+                <input type="range" class="weight-slider" min="0" max="100" value="${defaultWeight}">
                 <div class="weight-input-wrapper">
-                    <input type="number" class="number-input" min="0" max="100" value="${defaultWeight}">
-                    <span class="percent-sign">%</span>
+                    <input type="number" class="weight-number" min="0" max="100" value="${defaultWeight}">
                 </div>
-                <button class="remove-btn" title="Sil">×</button>
+                <button class="remove-btn" title="Sil" onclick="removeRow('${rowId}')">×</button>
             `;
 
-            const colorPicker = row.querySelector('.color-picker');
-            const hexInput = row.querySelector('.hex-input');
-            const rangeInput = row.querySelector('.range-input');
-            const numberInput = row.querySelector('.number-input');
-            const removeBtn = row.querySelector('.remove-btn');
+            // Olay Dinleyicileri (Sliders)
+            const slider = row.querySelector('.weight-slider');
+            const number = row.querySelector('.weight-number');
 
-            // Sistem Color Picker değişirse Hex kutusunu güncelle
-            colorPicker.addEventListener('input', (e) => {
-                hexInput.value = e.target.value.toUpperCase();
-                mixColors();
+            slider.addEventListener('input', (e) => { number.value = e.target.value; mixColors(); });
+            slider.addEventListener('mousedown', () => saveMixerState()); // Değişim öncesi kaydet
+            
+            number.addEventListener('input', (e) => {
+                let val = parseInt(e.target.value);
+                if (isNaN(val)) val = 0; if (val > 100) val = 100; if (val < 0) val = 0;
+                e.target.value = val; slider.value = val; mixColors();
             });
+            number.addEventListener('focus', () => saveMixerState());
 
-            // Akıllı Hex Kutusu Dinleyicisi (Yazma & Yapıştırma)
-            hexInput.addEventListener('input', (e) => {
-                let val = e.target.value;
-
-                // Eğer başında '#' yoksa ekle
-                if (val.charAt(0) !== '#') {
-                    val = '#' + val;
-                }
-
-                // '#' dışındaki geçersiz karakterleri temizle
-                val = val.substring(0, 1) + val.substring(1).replace(/[^0-9a-fA-F]/g, '');
-                
-                // Uzunluğu sınırla
-                if (val.length > 7) val = val.substring(0, 7);
-                
-                e.target.value = val;
-
-                // Geçerli bir hex ise sistem picker'ı ve karışımı güncelle
-                if (val.length === 7 || val.length === 4) {
-                    // Sistem picker 3 haneli hex sevmez, 6 haneliye çevirip verelim
-                    let fullHex = val;
-                    if (val.length === 4) {
-                        fullHex = '#' + val[1]+val[1] + val[2]+val[2] + val[3]+val[3];
-                    }
-                    colorPicker.value = fullHex;
+            // Doğrudan Hex Düzenleme (Kutu İçi)
+            const mixerHexInp = row.querySelector('.mixer-hex-input');
+            mixerHexInp.addEventListener('focus', () => saveMixerState());
+            mixerHexInp.addEventListener('input', (e) => {
+                let val = e.target.value.trim();
+                if(val.startsWith('#')) val = val.substring(1);
+                if(/^([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(val)) {
+                    const hex = '#' + val.toUpperCase();
+                    row.querySelector('.row-hex-val').value = hex;
+                    row.querySelector('.color-swatch').style.backgroundColor = hex;
                     mixColors();
                 }
             });
-
-            // Odaklanıldığında içindeki metni seç (Kolay yapıştırma için)
-            hexInput.addEventListener('focus', () => {
-                hexInput.select();
-            });
-
-            // Slider değişimi
-            rangeInput.addEventListener('input', (e) => {
-                numberInput.value = e.target.value;
-                mixColors();
-            });
-
-            // Sayısal input değişimi
-            numberInput.addEventListener('input', (e) => {
-                let val = parseInt(e.target.value);
-                if (isNaN(val)) val = 0;
-                if (val > 100) val = 100;
-                if (val < 0) val = 0;
-                
-                e.target.value = val; 
-                rangeInput.value = val;
-                mixColors();
-            });
-
-            // Silme Butonu
-            removeBtn.addEventListener('click', () => {
-                row.remove();
-                mixColors();
+            mixerHexInp.addEventListener('blur', (e) => {
+                // Eğer geçersiz bir şey yazıp çıktıysa, gerçek renge geri dön
+                e.target.value = row.querySelector('.row-hex-val').value;
             });
 
             colorList.appendChild(row);
             mixColors();
+        }
 
-            // Eğer butonla eklendiyse otomatik odaklan
-            if (focusHex) {
-                // DOM'un render olması için çok kısa bir süre tanıyoruz
-                setTimeout(() => {
-                    hexInput.focus();
-                }, 10);
+        function removeRow(id) { 
+            saveMixerState();
+            document.getElementById(id).remove(); 
+            mixColors(); 
+        }
+
+        function addNewRowFromButton() {
+            addColorRow('#6366f1', 50, true);
+        }
+
+        function addNewRowFromStandalone() {
+            saveMixerState();
+            addColorRow(standalonePicker.getHex(), 50, false); // Zaten kaydettik
+            showToast("Yeni Renk Eklendi!");
+        }
+
+        // Link Sütunu (Numaralı Butonlar) Güncellemesi
+        function updateLinkButtons() {
+            linkButtonsContainer.innerHTML = '';
+            const rows = document.querySelectorAll('.color-row');
+            
+            rows.forEach((row, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'link-btn';
+                btn.textContent = index + 1;
+                btn.title = `Bağımsız Picker rengini ${index + 1}. renge uygula`;
+                
+                btn.onclick = () => {
+                    saveMixerState();
+                    const newHex = standalonePicker.getHex();
+                    row.querySelector('.row-hex-val').value = newHex;
+                    row.querySelector('.mixer-hex-input').value = newHex;
+                    row.querySelector('.color-swatch').style.backgroundColor = newHex;
+                    mixColors();
+                    showToast(`${index + 1}. Renk Değiştirildi!`);
+                };
+                linkButtonsContainer.appendChild(btn);
+            });
+        }
+
+
+        // Ön Ayarlar (Presets)
+        function applyPreset(type) {
+            saveMixerState();
+            colorList.innerHTML = ''; // Temizle
+            if (type === 1) {
+                addColorRow(getRandomHex(), 100, false);
+                addColorRow(getRandomHex(), 100, false);
+            } else if (type === 2) {
+                addColorRow(getRandomHex(), 100, false);
+                addColorRow('#FFFFFF', 75, false);
+            } else if (type === 3) {
+                addColorRow(getRandomHex(), 100, false);
+                addColorRow('#FFFFFF', 25, false);
             }
         }
 
-        // Panoya Kopyalama İşlemi
-        resultBox.addEventListener('click', () => {
-            navigator.clipboard.writeText(currentHex).then(() => {
-                showToast();
-            });
-        });
-
-        function showToast() {
+        // Kopyalama & Toast Mesajı
+        function showToast(msg = "Panoya kopyalandı!") {
+            toast.textContent = msg;
             toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 2000);
+            setTimeout(() => toast.classList.remove('show'), 2000);
         }
 
-        // Başlangıçta örnek renkler
-        addColorRow('#FF3366', 100, false);
-        addColorRow('#FFFFFF', 75, false);
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => showToast());
+        }
+
+        resultBox.addEventListener('click', () => copyToClipboard(currentResultHex));
+        standalonePreview.addEventListener('click', () => copyToClipboard(standalonePreview.textContent));
+
+
+        // BAŞLANGIÇ ÇALIŞTIRMASI
+        addColorRow('#F43F5E', 50, false); 
+        addColorRow('#10B981', 50, false);
+        // Silinen undoStack'i başlatma esnasında temiz tutalım
+        undoStack = [];
 
     </script>
 </body>
